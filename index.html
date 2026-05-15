@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>❤️ 专属刮刮乐</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(160deg, #fce4ec 0%, #f8bbd0 30%, #f48fb1 70%, #ec407a 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .container { width: 100%; max-width: 420px; padding: 16px; }
+
+  .header {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .header .icon { font-size: 40px; }
+  .header .title {
+    font-size: 24px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(180,40,80,0.4);
+    letter-spacing: 3px;
+    margin: 4px 0;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 2px;
+  }
+
+  /* 卡片网格 */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 12px 0;
+  }
+
+  .card-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(180,40,80,0.25);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .card-item.enabled:active {
+    transform: scale(0.96);
+  }
+  .card-item.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .card-inner {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, #fff 0%, #fff0f5 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px;
+  }
+  .card-inner .prize-emoji { font-size: 36px; }
+  .card-inner .prize-label { font-size: 11px; color: #e91e63; letter-spacing: 2px; font-weight: 600; }
+  .card-inner .prize-name { font-size: 15px; font-weight: 900; color: #c62828; text-align: center; line-height: 1.3; }
+  .card-inner .card-number {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 13px;
+    font-weight: 900;
+    color: rgba(233,30,99,0.25);
+  }
+
+  canvas.scratch-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+
+  .lock-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* 底部提示 */
+  .bottom-hint {
+    text-align: center;
+    color: rgba(255,255,255,0.9);
+    font-size: 13px;
+    letter-spacing: 2px;
+    animation: pulse 1.5s ease-in-out infinite;
+    margin: 4px 0 12px;
+    min-height: 20px;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  /* 底部按钮 */
+  .btn-area { text-align: center; margin-top: 8px; }
+  .btn-area .btn {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    border: 2px solid rgba(255,255,255,0.5);
+    padding: 10px 32px;
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-area .btn:active {
+    background: rgba(255,255,255,0.4);
+    transform: scale(0.95);
+  }
+
+  /* 弹窗 */
+  .modal-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    animation: fadeIn 0.3s ease;
+  }
+  .modal-mask.hidden { display: none; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 28px 20px 22px;
+    text-align: center;
+    width: 88%;
+    max-width: 340px;
+    animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes popIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .modal-box .modal-emoji { font-size: 52px; margin-bottom: 8px; }
+  .modal-box .modal-text { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 4px; }
+  .modal-box .modal-prize { font-size: 22px; font-weight: 900; color: #e91e63; margin-bottom: 14px; }
+  .modal-box .btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #f06292, #e91e63);
+    color: #fff;
+    border: none;
+    padding: 10px 36px;
+    border-radius: 24px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    cursor: pointer;
+  }
+  .modal-box .btn:active { transform: scale(0.95); }
+
+  /* 其余卡片揭晓 */
+  .reveal-row {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #eee;
+  }
+  .reveal-row .mini-card {
+    background: #fff5f7;
+    border-radius: 8px;
+    padding: 6px 10px;
+    text-align: center;
+    flex: 1;
+  }
+  .reveal-row .mini-card .mini-emoji { font-size: 20px; }
+  .reveal-row .mini-card .mini-name {
+    font-size: 10px;
+    color: #e91e63;
+    font-weight: 700;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+
+  .confetti-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* 爱心飘落 */
+  .hearts-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="hearts-bg" id="heartsBg"></div>
+
+<div class="container">
+  <div class="header">
+    <div class="icon">💌</div>
+    <div class="title">选一张刮刮卡吧</div>
+    <div class="subtitle">四选一 · 刮开有惊喜</div>
+  </div>
+
+  <div class="grid" id="cardGrid"></div>
+
+  <div class="bottom-hint" id="bottomHint">👆 点击一张卡片，然后刮开它</div>
+
+  <div class="btn-area">
+    <button class="btn" onclick="resetGame()">🔄 再来一次</button>
+  </div>
+</div>
+
+<div class="modal-mask hidden" id="resultModal">
+  <div class="modal-box">
+    <div class="modal-emoji" id="modalEmoji"></div>
+    <div class="modal-text" id="modalText"></div>
+    <div class="modal-prize" id="modalPrize"></div>
+    <div class="reveal-row" id="revealRow"></div>
+    <button class="btn" onclick="closeModal()">❤️ 收下惊喜</button>
+  </div>
+</div>
+
+<div class="confetti-container" id="confetti"></div>
+
+<script>
+// ============================================================
+// 🎁 奖品配置（修改这里）— 至少4个, weight 控制概率
+// ============================================================
+const PRIZES = [
+  { name: "💋 一个深情的吻",           weight: 15, emoji: "💋" },
+  { name: "🍽️ 一顿烛光晚餐",           weight: 15, emoji: "🍽️" },
+  { name: "💆 一次全身按摩",           weight: 15, emoji: "💆" },
+  { name: "🎁 神秘礼物一份",           weight: 15, emoji: "🎁" },
+  { name: "🏝️ 周末短途旅行",           weight: 10, emoji: "🏝️" },
+  { name: "🍰 亲手做蛋糕给你吃",       weight: 10, emoji: "🍰" },
+  { name: "🛁 准备一次泡泡浴",         weight: 10, emoji: "🛁" },
+  { name: "🎬 一个月电影自由（我请客）", weight: 10, emoji: "🎬" },
+];
+
+// ============================================================
+// 从奖池中抽4个不重复的奖品
+// ============================================================
+function pickPrizes() {
+  const pool = PRIZES.map(p => ({ ...p }));
+  const selected = [];
+  const totalWeight = () => pool.reduce((s, p) => s + p.weight, 0);
+
+  for (let i = 0; i < 4; i++) {
+    let tw = totalWeight();
+    let rand = Math.random() * tw;
+    let idx = 0;
+    for (let j = 0; j < pool.length; j++) {
+      rand -= pool[j].weight;
+      if (rand <= 0) { idx = j; break; }
+    }
+    selected.push(pool[idx]);
+    pool.splice(idx, 1);
+    if (pool.length === 0) break;
+  }
+  return selected;
+}
+
+// ============================================================
+// 全局状态
+// ============================================================
+let cards = [];           // { prize, revealed, canvas, ctx, wrapper }
+let selectedIndex = -1;
+let isRevealed = false;
+let isDrawing = false;
+const cardGrid = document.getElementById('cardGrid');
+const bottomHint = document.getElementById('bottomHint');
+const resultModal = document.getElementById('resultModal');
+const modalEmoji = document.getElementById('modalEmoji');
+const modalText = document.getElementById('modalText');
+const modalPrize = document.getElementById('modalPrize');
+const revealRow = document.getElementById('revealRow');
+const confettiContainer = document.getElementById('confetti');
+
+// ============================================================
+// 构建4张卡片
+// ============================================================
+function buildCards() {
+  const prizes = pickPrizes();
+  cardGrid.innerHTML = '';
+  cards = [];
+  selectedIndex = -1;
+  isRevealed = false;
+  bottomHint.textContent = '👆 点击一张卡片，然后刮开它';
+  bottomHint.style.animation = 'pulse 1.5s ease-in-out infinite';
+
+  for (let i = 0; i < 4; i++) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'card-item enabled';
+    wrapper.setAttribute('data-index', i);
+
+    const inner = document.createElement('div');
+    inner.className = 'card-inner';
+    inner.innerHTML = `
+      <div class="prize-emoji">❓</div>
+      <div class="prize-label">???</div>
+      <div class="prize-name">刮开揭晓</div>
+      <div class="card-number">0${i + 1}</div>
+    `;
+
+    const canvas = document.createElement('canvas');
+    canvas.className = 'scratch-canvas';
+
+    wrapper.appendChild(inner);
+    wrapper.appendChild(canvas);
+    cardGrid.appendChild(wrapper);
+
+    const cardObj = {
+      prize: prizes[i],
+      revealed: false,
+      canvas,
+      wrapper,
+      inner,
+    };
+    cards.push(cardObj);
+
+    // 点击选择
+    wrapper.addEventListener('click', (e) => {
+      if (isRevealed || selectedIndex !== -1) return;
+      selectCard(i);
+    });
+
+    // 刮卡事件
+    bindScratch(canvas, i);
+  }
+
+  // 等DOM渲染完初始化canvas
+  requestAnimationFrame(() => {
+    cards.forEach((c, i) => {
+      initCardCanvas(i);
+    });
+  });
+}
+
+function initCardCanvas(index) {
+  const c = cards[index];
+  const wrapper = c.wrapper;
+  const canvas = c.canvas;
+  const rect = wrapper.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  c.ctx = ctx;
+  drawCardOverlay(index);
+}
+
+function drawCardOverlay(index) {
+  const c = cards[index];
+  const wrapper = c.wrapper;
+  const w = wrapper.clientWidth;
+  const h = wrapper.clientHeight;
+  const ctx = c.ctx;
+  ctx.clearRect(0, 0, w, h);
+
+  // 渐变底色
+  const grad = ctx.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, '#e0a0b0');
+  grad.addColorStop(0.5, '#d4879b');
+  grad.addColorStop(1, '#c07085');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  // 心形纹理
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.font = `${w * 0.15}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i < 20; i++) {
+    const x = Math.random() * w;
+    const y = Math.random() * h;
+    ctx.fillText('♥', x, y);
+    ctx.fillText('❤', x + 10, y - 8);
+  }
+
+  // 中心图案
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.font = `bold ${w * 0.16}px "PingFang SC","Microsoft YaHei",sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('刮开', w / 2, h / 2 - 6);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.font = `${w * 0.09}px "PingFang SC","Microsoft YaHei",sans-serif`;
+  ctx.fillText('❤️', w / 2, h / 2 + 20);
+}
+
+function selectCard(index) {
+  selectedIndex = index;
+  bottomHint.textContent = '👆 用手指刮开涂层！';
+  bottomHint.style.animation = 'pulse 1.5s ease-in-out infinite';
+
+  // 其他卡片变暗
+  cards.forEach((c, i) => {
+    if (i !== index) {
+      c.wrapper.classList.remove('enabled');
+      c.wrapper.classList.add('disabled');
+      const lock = document.createElement('div');
+      lock.className = 'lock-overlay';
+      lock.textContent = '🔒';
+      c.wrapper.appendChild(lock);
+    }
+  });
+}
+
+function bindScratch(canvas, index) {
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    if (e.touches) {
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top
+      };
+    }
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (selectedIndex !== index || isRevealed) return;
+    isDrawing = true;
+    const pos = getPos(e);
+    scratchAt(index, pos.x, pos.y);
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    if (!isDrawing || selectedIndex !== index || isRevealed) return;
+    const pos = getPos(e);
+    scratchAt(index, pos.x, pos.y);
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', () => { isDrawing = false; });
+  canvas.addEventListener('mousedown', (e) => {
+    if (selectedIndex !== index || isRevealed) return;
+    isDrawing = true;
+    const pos = getPos(e);
+    scratchAt(index, pos.x, pos.y);
+  });
+  canvas.addEventListener('mousemove', (e) => {
+    if (!isDrawing || selectedIndex !== index || isRevealed) return;
+    const pos = getPos(e);
+    scratchAt(index, pos.x, pos.y);
+  });
+  canvas.addEventListener('mouseup', () => { isDrawing = false; });
+  canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+}
+
+function scratchAt(index, x, y) {
+  const c = cards[index];
+  const ctx = c.ctx;
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  ctx.arc(x, y, 24, 0, Math.PI * 2);
+  ctx.fill();
+  checkReveal(index);
+}
+
+function checkReveal(index) {
+  const c = cards[index];
+  const wrapper = c.wrapper;
+  const canvas = c.canvas;
+  const w = wrapper.clientWidth;
+  const h = wrapper.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  const imageData = c.ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const pixels = imageData.data;
+  let transparent = 0;
+  const total = pixels.length / 4;
+  for (let i = 3; i < pixels.length; i += 4) {
+    if (pixels[i] === 0) transparent++;
+  }
+  if (transparent / total > 0.4) {
+    revealCard(index);
+  }
+}
+
+function revealCard(index) {
+  isRevealed = true;
+  const c = cards[index];
+  c.revealed = true;
+  bottomHint.textContent = '';
+  bottomHint.style.animation = 'none';
+
+  // 动画清除涂层
+  const ctx = c.ctx;
+  const wrapper = c.wrapper;
+  const w = wrapper.clientWidth;
+  let alpha = 0;
+  function tick() {
+    alpha += 0.06;
+    if (alpha >= 1) {
+      ctx.clearRect(0, 0, w, w);
+      updateCardInner(index);
+      showResultModal(index);
+      return;
+    }
+    ctx.clearRect(0, 0, w, w);
+    ctx.globalAlpha = 1 - alpha;
+    drawCardOverlay(index);
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+function updateCardInner(index) {
+  const c = cards[index];
+  const inner = c.inner;
+  inner.querySelector('.prize-emoji').textContent = c.prize.emoji;
+  inner.querySelector('.prize-label').textContent = '🎊 你中了';
+  inner.querySelector('.prize-name').textContent = c.prize.name;
+}
+
+function showResultModal(index) {
+  const c = cards[index];
+  modalEmoji.textContent = c.prize.emoji;
+  modalText.textContent = '恭喜你！';
+  modalPrize.textContent = c.prize.name;
+
+  // 显示其余三张卡片
+  revealRow.innerHTML = '';
+  cards.forEach((cc, i) => {
+    if (i !== index) {
+      const div = document.createElement('div');
+      div.className = 'mini-card';
+      div.innerHTML = `
+        <div class="mini-emoji">${cc.prize.emoji}</div>
+        <div class="mini-name">${cc.prize.name}</div>
+      `;
+      revealRow.appendChild(div);
+    }
+  });
+
+  // 清除未选卡片涂层，显示内容
+  cards.forEach((cc, i) => {
+    if (i !== index) {
+      const ctx = cc.ctx;
+      const wrapper = cc.wrapper;
+      ctx.clearRect(0, 0, wrapper.clientWidth, wrapper.clientHeight);
+      // 移除锁
+      const lock = cc.wrapper.querySelector('.lock-overlay');
+      if (lock) lock.remove();
+      // 显示内容
+      const inner = cc.inner;
+      inner.querySelector('.prize-emoji').textContent = cc.prize.emoji;
+      inner.querySelector('.prize-label').textContent = '未选择';
+      inner.querySelector('.prize-name').textContent = cc.prize.name;
+      cc.wrapper.classList.remove('disabled');
+    }
+  });
+
+  resultModal.classList.remove('hidden');
+  spawnConfetti();
+}
+
+function closeModal() {
+  resultModal.classList.add('hidden');
+}
+
+function resetGame() {
+  confettiContainer.innerHTML = '';
+  buildCards();
+}
+
+// ============================================================
+// 礼花
+// ============================================================
+function spawnConfetti() {
+  const colors = ['#e91e63', '#f06292', '#f48fb1', '#ff80ab', '#ff4081', '#ffc107', '#ffab91'];
+  const fragment = document.createDocumentFragment();
+  for (let i = 0; i < 80; i++) {
+    const piece = document.createElement('div');
+    const size = Math.random() * 8 + 4;
+    piece.style.cssText = `
+      position: absolute;
+      left: ${Math.random() * 100}%;
+      top: -10px;
+      width: ${size}px;
+      height: ${size * (Math.random() * 0.5 + 0.5)}px;
+      background: ${colors[Math.floor(Math.random() * colors.length)]};
+      border-radius: ${Math.random() > 0.6 ? '50%' : '2px'};
+      transform: rotate(${Math.random() * 360}deg);
+      animation: confettiFall ${Math.random() * 2 + 2}s linear forwards;
+      animation-delay: ${Math.random() * 0.6}s;
+    `;
+    fragment.appendChild(piece);
+  }
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg) scale(1); opacity:1; }
+      100% { transform: translateY(105vh) rotate(720deg) scale(0.2); opacity:0; }
+    }
+  `;
+  confettiContainer.appendChild(style);
+  confettiContainer.appendChild(fragment);
+  setTimeout(() => { confettiContainer.innerHTML = ''; }, 4000);
+}
+
+// ============================================================
+// 背景浮动爱心
+// ============================================================
+function spawnHearts() {
+  const bg = document.getElementById('heartsBg');
+  for (let i = 0; i < 12; i++) {
+    const heart = document.createElement('div');
+    const size = Math.random() * 16 + 10;
+    heart.textContent = ['❤', '💕', '💖', '💗', '💝'][Math.floor(Math.random() * 5)];
+    heart.style.cssText = `
+      position: fixed;
+      left: ${Math.random() * 100}%;
+      top: ${Math.random() * 100}%;
+      font-size: ${size}px;
+      opacity: ${Math.random() * 0.15 + 0.05};
+      animation: floatHeart ${Math.random() * 8 + 8}s linear infinite;
+      animation-delay: ${Math.random() * 5}s;
+      pointer-events: none;
+    `;
+    bg.appendChild(heart);
+  }
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes floatHeart {
+      0% { transform: translateY(0) rotate(0deg); opacity: 0.12; }
+      50% { transform: translateY(-60vh) rotate(20deg); opacity: 0.05; }
+      100% { transform: translateY(-110vh) rotate(0deg); opacity: 0.1; }
+    }
+  `;
+  bg.appendChild(style);
+}
+
+window.addEventListener('resize', () => {
+  if (!isRevealed && selectedIndex >= 0) {
+    initCardCanvas(selectedIndex);
+  }
+});
+
+// ============================================================
+// 启动
+// ============================================================
+spawnHearts();
+buildCards();
+</script>
+
+</body>
+</html>
