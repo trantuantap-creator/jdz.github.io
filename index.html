@@ -460,7 +460,12 @@ function bindScratch(canvas, index) {
 
   canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
-    if (selectedIndex !== index || isRevealed) return;
+    if (isRevealed) return;
+    if (selectedIndex === -1) {
+      selectCard(index);
+      return;
+    }
+    if (selectedIndex !== index) return;
     isDrawing = true;
     const pos = getPos(e);
     scratchAt(index, pos.x, pos.y);
@@ -475,7 +480,12 @@ function bindScratch(canvas, index) {
 
   canvas.addEventListener('touchend', () => { isDrawing = false; });
   canvas.addEventListener('mousedown', (e) => {
-    if (selectedIndex !== index || isRevealed) return;
+    if (isRevealed) return;
+    if (selectedIndex === -1) {
+      selectCard(index);
+      return;
+    }
+    if (selectedIndex !== index) return;
     isDrawing = true;
     const pos = getPos(e);
     scratchAt(index, pos.x, pos.y);
