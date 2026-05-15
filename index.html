@@ -131,35 +131,6 @@
       backdrop-filter: blur(16px);
     }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .stat {
-      min-height: 76px;
-      padding: 12px 8px;
-      border-radius: 20px;
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 238, 244, 0.92));
-      text-align: center;
-      box-shadow: 0 10px 28px rgba(154, 75, 95, 0.1);
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 22px;
-      color: var(--red);
-    }
-
-    .stat span {
-      display: block;
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
     .scratch-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -323,20 +294,6 @@
       box-shadow: inset 0 0 0 1px rgba(239, 71, 111, 0.2);
     }
 
-    .rules {
-      margin-top: 18px;
-      padding: 18px;
-      border-radius: 24px;
-      background: rgba(255, 255, 255, 0.62);
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.75;
-    }
-
-    .rules strong {
-      color: var(--red);
-    }
-
     .hearts {
       position: fixed;
       inset: 0;
@@ -377,19 +334,6 @@
         border-radius: 24px;
       }
 
-      .stats {
-        gap: 8px;
-      }
-
-      .stat {
-        min-height: 68px;
-        padding: 10px 6px;
-      }
-
-      .stat strong {
-        font-size: 20px;
-      }
-
       .scratch-grid {
         gap: 10px;
       }
@@ -420,12 +364,6 @@
     </section>
 
     <section class="panel" aria-label="刮刮乐抽奖区">
-      <div class="stats" aria-hidden="true">
-        <div class="stat"><strong>4</strong><span>张刮刮乐</span></div>
-        <div class="stat"><strong>5</strong><span>个礼物池</span></div>
-        <div class="stat"><strong>1</strong><span>个最终选择</span></div>
-      </div>
-
       <div class="scratch-grid" id="scratchGrid"></div>
 
       <div class="result" aria-live="polite">
@@ -439,10 +377,6 @@
       </div>
     </section>
 
-    <section class="rules">
-      <strong>礼物池：</strong>洗护套装、运动跑鞋、剃须刀、神秘小惊喜、以上全部。<br>
-      <strong>玩法：</strong>点开 4 张刮刮乐，抽到“以上全部”就是超级大奖；如果没抽到，也可以从已经刮出来的礼物里选一个。
-    </section>
   </main>
 
   <div class="hearts" id="hearts" aria-hidden="true"></div>
