@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>李永生的Surprise</title>
+<title>鏉庢案鐢熺殑Surprise</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -39,17 +39,15 @@
     letter-spacing: 2px;
   }
 
-  /* 卡片网格 */
+  /* 鍗＄墖缃戞牸 */
   .grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
     margin: 12px 0;
   }
+
   .card-item {
-    width: calc((100% - 24px) / 3);
-  }
     position: relative;
     aspect-ratio: 1 / 1;
     border-radius: 16px;
@@ -109,7 +107,7 @@
     z-index: 2;
   }
 
-  /* 底部提示 */
+  /* 搴曢儴鎻愮ず */
   .bottom-hint {
     text-align: center;
     color: rgba(255,255,255,0.9);
@@ -124,7 +122,7 @@
     50% { opacity: 1; }
   }
 
-  /* 底部按钮 */
+  /* 搴曢儴鎸夐挳 */
   .btn-area { text-align: center; margin-top: 8px; }
   .btn-area .btn {
     display: inline-block;
@@ -145,7 +143,7 @@
     transform: scale(0.95);
   }
 
-  /* 弹窗 */
+  /* 寮圭獥 */
   .modal-mask {
     position: fixed;
     inset: 0;
@@ -189,7 +187,7 @@
   }
   .modal-box .btn:active { transform: scale(0.95); }
 
-  /* 其余卡片揭晓 */
+  /* 鍏朵綑鍗＄墖鎻檽 */
   .reveal-row {
     display: flex;
     gap: 4px;
@@ -202,10 +200,9 @@
   .reveal-row .mini-card {
     background: #fff5f7;
     border-radius: 8px;
-    padding: 6px 8px;
+    padding: 6px 10px;
     text-align: center;
-    width: calc(25% - 3px);
-    min-width: 60px;
+    flex: 1;
   }
   .reveal-row .mini-card .mini-emoji { font-size: 20px; }
   .reveal-row .mini-card .mini-name {
@@ -229,7 +226,7 @@
     z-index: 1000;
   }
 
-  /* 爱心飘落 */
+  /* 鐖卞績椋樿惤 */
   .hearts-bg {
     position: fixed;
     inset: 0;
@@ -244,17 +241,17 @@
 
 <div class="container">
   <div class="header">
-    <div class="icon">💌</div>
-    <div class="title">李永生的Surprise</div>
-    <div class="subtitle">选一张刮刮卡 · 刮开有惊喜</div>
+    <div class="icon">馃拰</div>
+    <div class="title">鏉庢案鐢熺殑Surprise</div>
+    <div class="subtitle">閫変竴寮犲埉鍒崱 路 鍒紑鏈夋儕鍠?/div>
   </div>
 
   <div class="grid" id="cardGrid"></div>
 
-  <div class="bottom-hint" id="bottomHint">👆 点击一张卡片，然后刮开它</div>
+  <div class="bottom-hint" id="bottomHint">馃憜 鐐瑰嚮涓€寮犲崱鐗囷紝鐒跺悗鍒紑瀹?/div>
 
   <div class="btn-area">
-    <button class="btn" onclick="resetGame()">🔄 再来一次</button>
+    <button class="btn" onclick="resetGame()">馃攧 鍐嶆潵涓€娆?/button>
   </div>
 </div>
 
@@ -265,7 +262,7 @@
     <div class="modal-prize" id="modalPrize"></div>
     <div class="modal-desc" id="modalDesc"></div>
     <div class="reveal-row" id="revealRow"></div>
-    <button class="btn" onclick="closeModal()">❤️ 收下惊喜</button>
+    <button class="btn" onclick="closeModal()">鉂わ笍 鏀朵笅鎯婂枩</button>
   </div>
 </div>
 
@@ -273,31 +270,29 @@
 
 <script>
 // ============================================================
-// 🎁 奖品配置（修改这里）— 至少4个, weight 控制概率
+// 馃巵 濂栧搧閰嶇疆锛堜慨鏀硅繖閲岋級鈥?鑷冲皯4涓? weight 鎺у埗姒傜巼
 // ============================================================
 const PRIZES = [
-  { name: "洗护套装",   emoji: "🧴", desc: "让宝宝的脸变得嫩嫩哒" },
-  { name: "运动跑鞋",   emoji: "👟", desc: "让宝宝在锻炼的时候更轻松更舒适" },
-  { name: "剃须刀",     emoji: "🪒", desc: "让宝宝的脸清爽利落，扮演高中生" },
-  { name: "神秘小惊喜", emoji: "🎁", desc: "专属限定小彩蛋，是秘密先不说哦" },
-  { name: "以上全部！", emoji: "🎉", desc: "宝宝真的中大奖，以上礼物，一次性全拥有" },
+  { name: "娲楁姢濂楄",   emoji: "馃Т", desc: "璁╁疂瀹濈殑鑴稿彉寰楀瀚╁搾" },
+  { name: "杩愬姩璺戦瀷",   emoji: "馃憻", desc: "璁╁疂瀹濆湪閿荤偧鐨勬椂鍊欐洿杞绘澗鏇磋垝閫? },
+  { name: "鍓冮』鍒€",     emoji: "馃獟", desc: "璁╁疂瀹濈殑鑴告竻鐖藉埄钀斤紝鎵紨楂樹腑鐢? },
+  { name: "绁炵灏忔儕鍠?, emoji: "馃巵", desc: "涓撳睘闄愬畾灏忓僵铔嬶紝鏄瀵嗗厛涓嶈鍝? },
+  { name: "浠ヤ笂鍏ㄩ儴锛?, emoji: "馃帀", desc: "瀹濆疂鐪熺殑涓ぇ濂栵紝浠ヤ笂绀肩墿锛屼竴娆℃€у叏鎷ユ湁" },
 ];
 
 // ============================================================
-// 从奖池中抽4个不重复的奖品
-// ============================================================
+// 浠庡姹犱腑鎶?涓笉閲嶅鐨勫鍝?// ============================================================
 function pickPrizes() {
   const arr = [...PRIZES];
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-  return arr;
+  return arr.slice(0, 4);
 }
 
 // ============================================================
-// 全局状态
-// ============================================================
+// 鍏ㄥ眬鐘舵€?// ============================================================
 let cards = [];           // { prize, revealed, canvas, ctx, wrapper }
 let selectedIndex = -1;
 let isRevealed = false;
@@ -313,18 +308,17 @@ const revealRow = document.getElementById('revealRow');
 const confettiContainer = document.getElementById('confetti');
 
 // ============================================================
-// 构建4张卡片
-// ============================================================
+// 鏋勫缓4寮犲崱鐗?// ============================================================
 function buildCards() {
   const prizes = pickPrizes();
   cardGrid.innerHTML = '';
   cards = [];
   selectedIndex = -1;
   isRevealed = false;
-  bottomHint.textContent = '👆 点击一张卡片，然后刮开它';
+  bottomHint.textContent = '馃憜 鐐瑰嚮涓€寮犲崱鐗囷紝鐒跺悗鍒紑瀹?;
   bottomHint.style.animation = 'pulse 1.5s ease-in-out infinite';
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 4; i++) {
     const wrapper = document.createElement('div');
     wrapper.className = 'card-item enabled';
     wrapper.setAttribute('data-index', i);
@@ -332,9 +326,9 @@ function buildCards() {
     const inner = document.createElement('div');
     inner.className = 'card-inner';
     inner.innerHTML = `
-      <div class="prize-emoji">❓</div>
+      <div class="prize-emoji">鉂?/div>
       <div class="prize-label">???</div>
-      <div class="prize-name">刮开揭晓</div>
+      <div class="prize-name">鍒紑鎻檽</div>
       <div class="card-number">0${i + 1}</div>
     `;
 
@@ -354,17 +348,17 @@ function buildCards() {
     };
     cards.push(cardObj);
 
-    // 点击选择
+    // 鐐瑰嚮閫夋嫨
     wrapper.addEventListener('click', (e) => {
       if (isRevealed || selectedIndex !== -1) return;
       selectCard(i);
     });
 
-    // 刮卡事件
+    // 鍒崱浜嬩欢
     bindScratch(canvas, i);
   }
 
-  // 等DOM渲染完初始化canvas
+  // 绛塂OM娓叉煋瀹屽垵濮嬪寲canvas
   requestAnimationFrame(() => {
     cards.forEach((c, i) => {
       initCardCanvas(i);
@@ -395,7 +389,7 @@ function drawCardOverlay(index) {
   const ctx = c.ctx;
   ctx.clearRect(0, 0, w, h);
 
-  // 渐变底色
+  // 娓愬彉搴曡壊
   const grad = ctx.createLinearGradient(0, 0, w, h);
   grad.addColorStop(0, '#e0a0b0');
   grad.addColorStop(0.5, '#d4879b');
@@ -403,7 +397,7 @@ function drawCardOverlay(index) {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, w, h);
 
-  // 心形纹理
+  // 蹇冨舰绾圭悊
   ctx.fillStyle = 'rgba(255,255,255,0.2)';
   ctx.font = `${w * 0.15}px serif`;
   ctx.textAlign = 'center';
@@ -411,35 +405,35 @@ function drawCardOverlay(index) {
   for (let i = 0; i < 20; i++) {
     const x = Math.random() * w;
     const y = Math.random() * h;
-    ctx.fillText('♥', x, y);
-    ctx.fillText('❤', x + 10, y - 8);
+    ctx.fillText('鈾?, x, y);
+    ctx.fillText('鉂?, x + 10, y - 8);
   }
 
-  // 中心图案
+  // 涓績鍥炬
   ctx.fillStyle = 'rgba(255,255,255,0.9)';
   ctx.font = `bold ${w * 0.16}px "PingFang SC","Microsoft YaHei",sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('刮开', w / 2, h / 2 - 6);
+  ctx.fillText('鍒紑', w / 2, h / 2 - 6);
 
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
   ctx.font = `${w * 0.09}px "PingFang SC","Microsoft YaHei",sans-serif`;
-  ctx.fillText('❤️', w / 2, h / 2 + 20);
+  ctx.fillText('鉂わ笍', w / 2, h / 2 + 20);
 }
 
 function selectCard(index) {
   selectedIndex = index;
-  bottomHint.textContent = '👆 用手指刮开涂层！';
+  bottomHint.textContent = '馃憜 鐢ㄦ墜鎸囧埉寮€娑傚眰锛?;
   bottomHint.style.animation = 'pulse 1.5s ease-in-out infinite';
 
-  // 其他卡片变暗
+  // 鍏朵粬鍗＄墖鍙樻殫
   cards.forEach((c, i) => {
     if (i !== index) {
       c.wrapper.classList.remove('enabled');
       c.wrapper.classList.add('disabled');
       const lock = document.createElement('div');
       lock.className = 'lock-overlay';
-      lock.textContent = '🔒';
+      lock.textContent = '馃敀';
       c.wrapper.appendChild(lock);
     }
   });
@@ -534,7 +528,7 @@ function revealCard(index) {
   bottomHint.textContent = '';
   bottomHint.style.animation = 'none';
 
-  // 动画清除涂层
+  // 鍔ㄧ敾娓呴櫎娑傚眰
   const ctx = c.ctx;
   const wrapper = c.wrapper;
   const w = wrapper.clientWidth;
@@ -560,18 +554,18 @@ function updateCardInner(index) {
   const c = cards[index];
   const inner = c.inner;
   inner.querySelector('.prize-emoji').textContent = c.prize.emoji;
-  inner.querySelector('.prize-label').textContent = '🎊 你中了';
+  inner.querySelector('.prize-label').textContent = '馃帄 浣犱腑浜?;
   inner.querySelector('.prize-name').textContent = c.prize.name;
 }
 
 function showResultModal(index) {
   const c = cards[index];
   modalEmoji.textContent = c.prize.emoji;
-  modalText.textContent = c.prize.name === '以上全部！' ? '哇！！' : '恭喜你！';
+  modalText.textContent = c.prize.name === '浠ヤ笂鍏ㄩ儴锛? ? '鍝囷紒锛? : '鎭枩浣狅紒';
   modalPrize.textContent = c.prize.name;
   modalDesc.textContent = c.prize.desc;
 
-  // 显示其余卡片
+  // 鏄剧ず鍏朵綑鍗＄墖
   revealRow.innerHTML = '';
   cards.forEach((cc, i) => {
     if (i !== index) {
@@ -586,19 +580,18 @@ function showResultModal(index) {
     }
   });
 
-  // 清除未选卡片涂层，显示内容
+  // 娓呴櫎鏈€夊崱鐗囨秱灞傦紝鏄剧ず鍐呭
   cards.forEach((cc, i) => {
     if (i !== index) {
       const ctx = cc.ctx;
       const wrapper = cc.wrapper;
       ctx.clearRect(0, 0, wrapper.clientWidth, wrapper.clientHeight);
-      // 移除锁
-      const lock = cc.wrapper.querySelector('.lock-overlay');
+      // 绉婚櫎閿?      const lock = cc.wrapper.querySelector('.lock-overlay');
       if (lock) lock.remove();
-      // 显示内容
+      // 鏄剧ず鍐呭
       const inner = cc.inner;
       inner.querySelector('.prize-emoji').textContent = cc.prize.emoji;
-      inner.querySelector('.prize-label').textContent = '未选择';
+      inner.querySelector('.prize-label').textContent = '鏈€夋嫨';
       inner.querySelector('.prize-name').textContent = cc.prize.name;
       cc.wrapper.classList.remove('disabled');
     }
@@ -618,7 +611,7 @@ function resetGame() {
 }
 
 // ============================================================
-// 礼花
+// 绀艰姳
 // ============================================================
 function spawnConfetti() {
   const colors = ['#e91e63', '#f06292', '#f48fb1', '#ff80ab', '#ff4081', '#ffc107', '#ffab91'];
@@ -653,14 +646,14 @@ function spawnConfetti() {
 }
 
 // ============================================================
-// 背景浮动爱心
+// 鑳屾櫙娴姩鐖卞績
 // ============================================================
 function spawnHearts() {
   const bg = document.getElementById('heartsBg');
   for (let i = 0; i < 12; i++) {
     const heart = document.createElement('div');
     const size = Math.random() * 16 + 10;
-    heart.textContent = ['❤', '💕', '💖', '💗', '💝'][Math.floor(Math.random() * 5)];
+    heart.textContent = ['鉂?, '馃挄', '馃挅', '馃挆', '馃挐'][Math.floor(Math.random() * 5)];
     heart.style.cssText = `
       position: fixed;
       left: ${Math.random() * 100}%;
@@ -691,7 +684,7 @@ window.addEventListener('resize', () => {
 });
 
 // ============================================================
-// 启动
+// 鍚姩
 // ============================================================
 spawnHearts();
 buildCards();
