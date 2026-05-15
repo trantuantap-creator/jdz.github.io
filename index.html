@@ -41,13 +41,15 @@
 
   /* 卡片网格 */
   .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 12px;
     margin: 12px 0;
   }
-
   .card-item {
+    width: calc((100% - 24px) / 3);
+  }
     position: relative;
     aspect-ratio: 1 / 1;
     border-radius: 16px;
@@ -171,7 +173,8 @@
   }
   .modal-box .modal-emoji { font-size: 52px; margin-bottom: 8px; }
   .modal-box .modal-text { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 4px; }
-  .modal-box .modal-prize { font-size: 22px; font-weight: 900; color: #e91e63; margin-bottom: 14px; }
+  .modal-box .modal-prize { font-size: 22px; font-weight: 900; color: #e91e63; margin-bottom: 4px; }
+  .modal-box .modal-desc { font-size: 13px; color: #888; margin-bottom: 14px; line-height: 1.5; }
   .modal-box .btn {
     display: inline-block;
     background: linear-gradient(135deg, #f06292, #e91e63);
@@ -189,24 +192,32 @@
   /* 其余卡片揭晓 */
   .reveal-row {
     display: flex;
-    gap: 6px;
+    gap: 4px;
     justify-content: center;
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px dashed #eee;
+    flex-wrap: wrap;
   }
   .reveal-row .mini-card {
     background: #fff5f7;
     border-radius: 8px;
-    padding: 6px 10px;
+    padding: 6px 8px;
     text-align: center;
-    flex: 1;
+    width: calc(25% - 3px);
+    min-width: 60px;
   }
   .reveal-row .mini-card .mini-emoji { font-size: 20px; }
   .reveal-row .mini-card .mini-name {
     font-size: 10px;
     color: #e91e63;
     font-weight: 700;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+  .reveal-row .mini-card .mini-desc {
+    font-size: 9px;
+    color: #999;
     margin-top: 2px;
     line-height: 1.3;
   }
@@ -252,6 +263,7 @@
     <div class="modal-emoji" id="modalEmoji"></div>
     <div class="modal-text" id="modalText"></div>
     <div class="modal-prize" id="modalPrize"></div>
+    <div class="modal-desc" id="modalDesc"></div>
     <div class="reveal-row" id="revealRow"></div>
     <button class="btn" onclick="closeModal()">❤️ 收下惊喜</button>
   </div>
@@ -264,37 +276,23 @@
 // 🎁 奖品配置（修改这里）— 至少4个, weight 控制概率
 // ============================================================
 const PRIZES = [
-  { name: "💋 一个深情的吻",           weight: 15, emoji: "💋" },
-  { name: "🍽️ 一顿烛光晚餐",           weight: 15, emoji: "🍽️" },
-  { name: "💆 一次全身按摩",           weight: 15, emoji: "💆" },
-  { name: "🎁 神秘礼物一份",           weight: 15, emoji: "🎁" },
-  { name: "🏝️ 周末短途旅行",           weight: 10, emoji: "🏝️" },
-  { name: "🍰 亲手做蛋糕给你吃",       weight: 10, emoji: "🍰" },
-  { name: "🛁 准备一次泡泡浴",         weight: 10, emoji: "🛁" },
-  { name: "🎬 一个月电影自由（我请客）", weight: 10, emoji: "🎬" },
+  { name: "洗护套装",   emoji: "🧴", desc: "让宝宝的脸变得嫩嫩哒" },
+  { name: "运动跑鞋",   emoji: "👟", desc: "让宝宝在锻炼的时候更轻松更舒适" },
+  { name: "剃须刀",     emoji: "🪒", desc: "让宝宝的脸清爽利落，扮演高中生" },
+  { name: "神秘小惊喜", emoji: "🎁", desc: "专属限定小彩蛋，是秘密先不说哦" },
+  { name: "以上全部！", emoji: "🎉", desc: "宝宝真的中大奖，以上礼物，一次性全拥有" },
 ];
 
 // ============================================================
 // 从奖池中抽4个不重复的奖品
 // ============================================================
 function pickPrizes() {
-  const pool = PRIZES.map(p => ({ ...p }));
-  const selected = [];
-  const totalWeight = () => pool.reduce((s, p) => s + p.weight, 0);
-
-  for (let i = 0; i < 4; i++) {
-    let tw = totalWeight();
-    let rand = Math.random() * tw;
-    let idx = 0;
-    for (let j = 0; j < pool.length; j++) {
-      rand -= pool[j].weight;
-      if (rand <= 0) { idx = j; break; }
-    }
-    selected.push(pool[idx]);
-    pool.splice(idx, 1);
-    if (pool.length === 0) break;
+  const arr = [...PRIZES];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-  return selected;
+  return arr;
 }
 
 // ============================================================
@@ -310,6 +308,7 @@ const resultModal = document.getElementById('resultModal');
 const modalEmoji = document.getElementById('modalEmoji');
 const modalText = document.getElementById('modalText');
 const modalPrize = document.getElementById('modalPrize');
+const modalDesc = document.getElementById('modalDesc');
 const revealRow = document.getElementById('revealRow');
 const confettiContainer = document.getElementById('confetti');
 
@@ -325,7 +324,7 @@ function buildCards() {
   bottomHint.textContent = '👆 点击一张卡片，然后刮开它';
   bottomHint.style.animation = 'pulse 1.5s ease-in-out infinite';
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     const wrapper = document.createElement('div');
     wrapper.className = 'card-item enabled';
     wrapper.setAttribute('data-index', i);
@@ -568,10 +567,11 @@ function updateCardInner(index) {
 function showResultModal(index) {
   const c = cards[index];
   modalEmoji.textContent = c.prize.emoji;
-  modalText.textContent = '恭喜你！';
+  modalText.textContent = c.prize.name === '以上全部！' ? '哇！！' : '恭喜你！';
   modalPrize.textContent = c.prize.name;
+  modalDesc.textContent = c.prize.desc;
 
-  // 显示其余三张卡片
+  // 显示其余卡片
   revealRow.innerHTML = '';
   cards.forEach((cc, i) => {
     if (i !== index) {
@@ -580,6 +580,7 @@ function showResultModal(index) {
       div.innerHTML = `
         <div class="mini-emoji">${cc.prize.emoji}</div>
         <div class="mini-name">${cc.prize.name}</div>
+        <div class="mini-desc">${cc.prize.desc}</div>
       `;
       revealRow.appendChild(div);
     }
