@@ -1,483 +1,591 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>鏉庢案鐢熺殑Surprise</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(160deg, #fce4ec 0%, #f8bbd0 30%, #f48fb1 70%, #ec407a 100%);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-x: hidden;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .container { width: 100%; max-width: 420px; padding: 16px; }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ff6f91">
+  <title>给宝宝的专属刮刮乐</title>
+  <style>
+    :root {
+      --bg: #fff4f7;
+      --card: rgba(255, 255, 255, 0.82);
+      --pink: #ff6f91;
+      --rose: #ff8fab;
+      --red: #ef476f;
+      --gold: #ffca3a;
+      --ink: #46333a;
+      --muted: #846875;
+      --shadow: 0 18px 60px rgba(239, 71, 111, 0.2);
+    }
 
-  .header { text-align: center; margin-bottom: 8px; }
-  .header .icon { font-size: 40px; }
-  .header .title {
-    font-size: 24px; font-weight: 900; color: #fff;
-    text-shadow: 0 2px 8px rgba(180,40,80,0.4);
-    letter-spacing: 3px; margin: 4px 0;
-  }
-  .header .subtitle {
-    font-size: 13px; color: rgba(255,255,255,0.85); letter-spacing: 2px;
-  }
+    * {
+      box-sizing: border-box;
+    }
 
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+    html {
+      min-height: 100%;
+      background: var(--bg);
+    }
 
-  .card-item {
-    position: relative; aspect-ratio: 1 / 1; border-radius: 16px; overflow: hidden;
-    box-shadow: 0 4px 20px rgba(180,40,80,0.25); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;
-  }
-  .card-item.enabled:active { transform: scale(0.96); }
-  .card-item.disabled { opacity: 0.4; pointer-events: none; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(255, 202, 58, 0.42), transparent 30%),
+        radial-gradient(circle at 84% 8%, rgba(255, 111, 145, 0.38), transparent 26%),
+        linear-gradient(160deg, #fff7df 0%, #ffe0ec 48%, #fff4f7 100%);
+      overflow-x: hidden;
+    }
 
-  .card-inner {
-    position: absolute; inset: 0;
-    background: linear-gradient(145deg, #fff 0%, #fff0f5 100%);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px;
-  }
-  .card-inner .prize-emoji { font-size: 36px; }
-  .card-inner .prize-label { font-size: 11px; color: #e91e63; letter-spacing: 2px; font-weight: 600; }
-  .card-inner .prize-name { font-size: 15px; font-weight: 900; color: #c62828; text-align: center; line-height: 1.3; }
-  .card-inner .card-number {
-    position: absolute; top: 10px; right: 14px;
-    font-size: 13px; font-weight: 900; color: rgba(233,30,99,0.25);
-  }
+    .page {
+      width: min(100%, 760px);
+      margin: 0 auto;
+      padding: 28px 18px 38px;
+      position: relative;
+    }
 
-  canvas.scratch-canvas {
-    position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none;
-  }
+    .page::before,
+    .page::after {
+      content: "";
+      position: fixed;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      filter: blur(6px);
+      opacity: 0.45;
+      pointer-events: none;
+      z-index: -1;
+    }
 
-  .lock-overlay {
-    position: absolute; inset: 0; background: rgba(0,0,0,0.15);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 40px; pointer-events: none; z-index: 2;
-  }
+    .page::before {
+      left: -80px;
+      top: 110px;
+      background: #ffd166;
+    }
 
-  .bottom-hint {
-    text-align: center; color: rgba(255,255,255,0.9); font-size: 13px;
-    letter-spacing: 2px; animation: pulse 1.5s ease-in-out infinite;
-    margin: 4px 0 12px; min-height: 20px;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 0.6; } 50% { opacity: 1; }
-  }
+    .page::after {
+      right: -90px;
+      bottom: 90px;
+      background: #ff8fab;
+    }
 
-  .btn-area { text-align: center; margin-top: 8px; }
-  .btn-area .btn {
-    display: inline-block; background: rgba(255,255,255,0.25); backdrop-filter: blur(10px);
-    color: #fff; border: 2px solid rgba(255,255,255,0.5);
-    padding: 10px 32px; border-radius: 24px; font-size: 14px;
-    font-weight: 600; letter-spacing: 3px; cursor: pointer; transition: all 0.2s;
-  }
-  .btn-area .btn:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
+    .hero {
+      text-align: center;
+      padding: 22px 14px 18px;
+    }
 
-  .modal-mask {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.55);
-    display: flex; align-items: center; justify-content: center; z-index: 999;
-    animation: fadeIn 0.3s ease;
-  }
-  .modal-mask.hidden { display: none; }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0 0 12px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 111, 145, 0.28);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.68);
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 8px 26px rgba(255, 111, 145, 0.14);
+    }
 
-  .modal-box {
-    background: #fff; border-radius: 20px; padding: 28px 20px 22px;
-    text-align: center; width: 88%; max-width: 340px;
-    animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 9vw, 54px);
+      line-height: 1.05;
+      letter-spacing: -1px;
+      color: #3a2630;
+    }
 
-  .modal-box .modal-emoji { font-size: 52px; margin-bottom: 8px; }
-  .modal-box .modal-text { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 4px; }
-  .modal-box .modal-prize { font-size: 22px; font-weight: 900; color: #e91e63; margin-bottom: 4px; }
-  .modal-box .modal-desc { font-size: 13px; color: #888; margin-bottom: 14px; line-height: 1.5; }
-  .modal-box .btn {
-    display: inline-block; background: linear-gradient(135deg, #f06292, #e91e63);
-    color: #fff; border: none; padding: 10px 36px; border-radius: 24px;
-    font-size: 15px; font-weight: 600; letter-spacing: 2px; cursor: pointer;
-  }
-  .modal-box .btn:active { transform: scale(0.95); }
+    .gradient-text {
+      display: block;
+      color: transparent;
+      background: linear-gradient(92deg, #ef476f, #ff8fab 44%, #f4a261 96%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
 
-  .reveal-row {
-    display: flex; gap: 4px; justify-content: center; margin-top: 12px;
-    padding-top: 12px; border-top: 1px dashed #eee; flex-wrap: wrap;
-  }
-  .reveal-row .mini-card {
-    background: #fff5f7; border-radius: 8px; padding: 6px 10px;
-    text-align: center; flex: 1;
-  }
-  .reveal-row .mini-card .mini-emoji { font-size: 20px; }
-  .reveal-row .mini-card .mini-name {
-    font-size: 10px; color: #e91e63; font-weight: 700; margin-top: 2px; line-height: 1.3;
-  }
-  .reveal-row .mini-card .mini-desc {
-    font-size: 9px; color: #999; margin-top: 2px; line-height: 1.3;
-  }
+    .subtitle {
+      max-width: 560px;
+      margin: 16px auto 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
 
-  .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
-  .hearts-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-</style>
+    .notice {
+      margin: 10px auto 0;
+      color: #9c5061;
+      font-size: 13px;
+    }
+
+    .panel {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 28px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      min-height: 76px;
+      padding: 12px 8px;
+      border-radius: 20px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 238, 244, 0.92));
+      text-align: center;
+      box-shadow: 0 10px 28px rgba(154, 75, 95, 0.1);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 22px;
+      color: var(--red);
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .scratch-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .scratch-card {
+      position: relative;
+      min-height: 182px;
+      border: 0;
+      border-radius: 24px;
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      box-shadow: 0 14px 34px rgba(239, 71, 111, 0.16);
+      cursor: pointer;
+      overflow: hidden;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .scratch-card:focus-visible {
+      outline: 3px solid rgba(239, 71, 111, 0.55);
+      outline-offset: 3px;
+    }
+
+    .prize,
+    .cover {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 14px;
+      text-align: center;
+    }
+
+    .prize {
+      background: linear-gradient(145deg, #fff, #fff2e2);
+    }
+
+    .prize-icon {
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .prize-title {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #3a2630;
+    }
+
+    .prize-desc {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .cover {
+      z-index: 2;
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0 18%, transparent 18% 32%, rgba(255, 255, 255, 0.16) 32% 44%, transparent 44% 100%),
+        linear-gradient(145deg, #ff6f91, #ef476f 58%, #d83c66);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .scratch-card.revealed .cover {
+      opacity: 0;
+      transform: scale(1.12) rotate(2deg);
+      pointer-events: none;
+    }
+
+    .cover-symbol {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.22);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+      font-size: 28px;
+    }
+
+    .cover-title {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
+
+    .cover-tip {
+      margin-top: 8px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 13px;
+    }
+
+    .result {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 245, 248, 0.96));
+      border: 1px solid rgba(255, 111, 145, 0.18);
+      text-align: center;
+    }
+
+    .result h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #3a2630;
+    }
+
+    .result p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .selected-prize {
+      display: none;
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 20px;
+      background: #fff4d1;
+      color: #5c3f00;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .selected-prize.show {
+      display: block;
+      animation: pop 0.35s ease both;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn {
+      flex: 1;
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 16px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--red), var(--rose));
+      font-size: 15px;
+      font-weight: 900;
+      box-shadow: 0 12px 24px rgba(239, 71, 111, 0.22);
+      cursor: pointer;
+    }
+
+    .btn.secondary {
+      color: var(--red);
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(239, 71, 111, 0.2);
+    }
+
+    .rules {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.62);
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .rules strong {
+      color: var(--red);
+    }
+
+    .hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 20;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -32px;
+      animation: floatUp 2.8s ease-in forwards;
+      font-size: 22px;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.92); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 0; }
+      15% { opacity: 1; }
+      100% { transform: translateY(-110vh) scale(1.35) rotate(18deg); opacity: 0; }
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        padding: 20px 12px 32px;
+      }
+
+      .hero {
+        padding-top: 16px;
+      }
+
+      .panel {
+        padding: 12px;
+        border-radius: 24px;
+      }
+
+      .stats {
+        gap: 8px;
+      }
+
+      .stat {
+        min-height: 68px;
+        padding: 10px 6px;
+      }
+
+      .stat strong {
+        font-size: 20px;
+      }
+
+      .scratch-grid {
+        gap: 10px;
+      }
+
+      .scratch-card {
+        min-height: 164px;
+        border-radius: 20px;
+      }
+
+      .prize-title,
+      .cover-title {
+        font-size: 16px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
+  <main class="page">
+    <section class="hero" aria-labelledby="title">
+      <p class="eyebrow">💌 宝宝专属 · 今日限定</p>
+      <h1 id="title">四张刮刮乐<span class="gradient-text">抽一个爱的奖励</span></h1>
+      <p class="subtitle">请宝宝认真挑选、轻轻一点，刮开今天的好运。每张卡片都有可能藏着专属礼物，最后可以从刮出来的礼物里选一个带走。</p>
+      <p class="notice">温馨提示：中奖解释权归最爱宝宝的人所有。</p>
+    </section>
 
-<div class="hearts-bg" id="heartsBg"></div>
+    <section class="panel" aria-label="刮刮乐抽奖区">
+      <div class="stats" aria-hidden="true">
+        <div class="stat"><strong>4</strong><span>张刮刮乐</span></div>
+        <div class="stat"><strong>5</strong><span>个礼物池</span></div>
+        <div class="stat"><strong>1</strong><span>个最终选择</span></div>
+      </div>
 
-<div class="container">
-  <div class="header">
-    <div class="icon">馃拰</div>
-    <div class="title">鏉庢案鐢熺殑Surprise</div>
-    <div class="subtitle">閫変竴寮犲埉鍒崱 路 鍒紑鏈夋儕鍠?/div>
-  </div>
+      <div class="scratch-grid" id="scratchGrid"></div>
 
-  <div class="grid" id="cardGrid"></div>
+      <div class="result" aria-live="polite">
+        <h2 id="resultTitle">先刮开一张看看吧</h2>
+        <p id="resultText">刮开的礼物会出现在卡片里，全部刮完以后宝宝可以选一个最心动的。</p>
+        <div class="selected-prize" id="selectedPrize"></div>
+        <div class="actions">
+          <button class="btn" id="chooseButton" type="button">从已刮出的礼物里选一个</button>
+          <button class="btn secondary" id="resetButton" type="button">重新洗牌再玩一次</button>
+        </div>
+      </div>
+    </section>
 
-  <div class="bottom-hint" id="bottomHint">馃憜 鐐瑰嚮涓€寮犲崱鐗囷紝鐒跺悗鍒紑瀹?/div>
+    <section class="rules">
+      <strong>礼物池：</strong>洗护套装、运动跑鞋、剃须刀、神秘小惊喜、以上全部。<br>
+      <strong>玩法：</strong>点开 4 张刮刮乐，抽到“以上全部”就是超级大奖；如果没抽到，也可以从已经刮出来的礼物里选一个。
+    </section>
+  </main>
 
-  <div class="btn-area">
-    <button class="btn" onclick="resetGame()">馃攧 鍐嶆潵涓€娆?/button>
-  </div>
-</div>
+  <div class="hearts" id="hearts" aria-hidden="true"></div>
 
-<div class="modal-mask hidden" id="resultModal">
-  <div class="modal-box">
-    <div class="modal-emoji" id="modalEmoji"></div>
-    <div class="modal-text" id="modalText"></div>
-    <div class="modal-prize" id="modalPrize"></div>
-    <div class="modal-desc" id="modalDesc"></div>
-    <div class="reveal-row" id="revealRow"></div>
-    <button class="btn" onclick="closeModal()">鉂わ笍 鏀朵笅鎯婂枩</button>
-  </div>
-</div>
+  <script>
+    const prizes = [
+      {
+        icon: "🧴",
+        title: "洗护套装",
+        desc: "让宝宝的脸变得嫩嫩哒"
+      },
+      {
+        icon: "👟",
+        title: "运动跑鞋",
+        desc: "让宝宝在锻炼的时候更轻松更舒适"
+      },
+      {
+        icon: "🪒",
+        title: "剃须刀",
+        desc: "让宝宝的脸清爽利落，扮演高中生"
+      },
+      {
+        icon: "🎁",
+        title: "神秘小惊喜",
+        desc: "专属限定小彩蛋，是秘密先不说哦"
+      },
+      {
+        icon: "🎉",
+        title: "以上全部！",
+        desc: "宝宝真的中大奖，一次性全拥有"
+      }
+    ];
 
-<div class="confetti-container" id="confetti"></div>
+    const grid = document.querySelector("#scratchGrid");
+    const resultTitle = document.querySelector("#resultTitle");
+    const resultText = document.querySelector("#resultText");
+    const selectedPrize = document.querySelector("#selectedPrize");
+    const chooseButton = document.querySelector("#chooseButton");
+    const resetButton = document.querySelector("#resetButton");
+    const hearts = document.querySelector("#hearts");
 
-<script>
-// ============================================================
-// 馃巵 濂栧搧
-// ============================================================
-const PRIZES = [
-  { name: "娲楁姢濂楄",   emoji: "馃Т", desc: "璁╁疂瀹濈殑鑴稿彉寰楀瀚╁搾" },
-  { name: "杩愬姩璺戦瀷",   emoji: "馃憻", desc: "璁╁疂瀹濆湪閿荤偧鐨勬椂鍊欐洿杞绘澗鏇磋垝閫? },
-  { name: "鍓冮』鍒€",     emoji: "馃獟", desc: "璁╁疂瀹濈殑鑴告竻鐖藉埄钀斤紝鎵紨楂樹腑鐢? },
-  { name: "绁炵灏忔儕鍠?, emoji: "馃巵", desc: "涓撳睘闄愬畾灏忓僵铔嬶紝鏄瀵嗗厛涓嶈鍝? },
-  { name: "浠ヤ笂鍏ㄩ儴锛?, emoji: "馃帀", desc: "瀹濆疂鐪熺殑涓ぇ濂栵紝浠ヤ笂绀肩墿涓€娆℃€у叏鎷ユ湁" },
-];
+    let cards = [];
+    let revealedCards = [];
 
-// ============================================================
-// 闅忔満鎶?涓紙娲楃墝鍚庡彇鍓?锛?// ============================================================
-function pickPrizes() {
-  const arr = [...PRIZES];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr.slice(0, 4);
-}
-
-// ============================================================
-// 鍏ㄥ眬鐘舵€?// ============================================================
-let cards = [];
-let selectedIndex = -1;
-let isRevealed = false;
-let isDrawing = false;
-const cardGrid = document.getElementById('cardGrid');
-const bottomHint = document.getElementById('bottomHint');
-const resultModal = document.getElementById('resultModal');
-const modalEmoji = document.getElementById('modalEmoji');
-const modalText = document.getElementById('modalText');
-const modalPrize = document.getElementById('modalPrize');
-const modalDesc = document.getElementById('modalDesc');
-const revealRow = document.getElementById('revealRow');
-const confettiContainer = document.getElementById('confetti');
-
-// ============================================================
-// 鏋勫缓4寮犲崱鐗?// ============================================================
-function buildCards() {
-  const prizes = pickPrizes();
-  cardGrid.innerHTML = '';
-  cards = [];
-  selectedIndex = -1;
-  isRevealed = false;
-  bottomHint.textContent = '馃憜 鐐瑰嚮涓€寮犲崱鐗囷紝鐒跺悗鍒紑瀹?;
-  bottomHint.style.animation = 'pulse 1.5s ease-in-out infinite';
-
-  for (let i = 0; i < 4; i++) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'card-item enabled';
-    wrapper.setAttribute('data-index', i);
-
-    const inner = document.createElement('div');
-    inner.className = 'card-inner';
-    inner.innerHTML = '<div class="prize-emoji">鉂?/div><div class="prize-label">???</div><div class="prize-name">鍒紑鎻檽</div><div class="card-number">0' + (i + 1) + '</div>';
-
-    const canvas = document.createElement('canvas');
-    canvas.className = 'scratch-canvas';
-
-    wrapper.appendChild(inner);
-    wrapper.appendChild(canvas);
-    cardGrid.appendChild(wrapper);
-
-    const cardObj = { prize: prizes[i], revealed: false, canvas, wrapper, inner, scratchCount: 0 };
-    cards.push(cardObj);
-    bindScratch(canvas, i);
-  }
-
-  requestAnimationFrame(() => {
-    cards.forEach((c, i) => { initCardCanvas(i); });
-  });
-}
-
-function initCardCanvas(index) {
-  const c = cards[index];
-  const wrapper = c.wrapper;
-  const canvas = c.canvas;
-  const rect = wrapper.getBoundingClientRect();
-  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  c.ctx = ctx;
-  drawCardOverlay(index);
-}
-
-function drawCardOverlay(index) {
-  const c = cards[index];
-  const wrapper = c.wrapper;
-  const w = wrapper.clientWidth;
-  const h = wrapper.clientHeight;
-  const ctx = c.ctx;
-  const grad = ctx.createLinearGradient(0, 0, w, h);
-  grad.addColorStop(0, '#e0a0b0');
-  grad.addColorStop(0.5, '#d4879b');
-  grad.addColorStop(1, '#c07085');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = 'rgba(255,255,255,0.2)';
-  ctx.font = (w * 0.15) + 'px serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  for (let i = 0; i < 20; i++) {
-    ctx.fillText('鈾?, Math.random() * w, Math.random() * h);
-    ctx.fillText('鉂?, Math.random() * w, Math.random() * h);
-  }
-  ctx.fillStyle = 'rgba(255,255,255,0.9)';
-  ctx.font = 'bold ' + (w * 0.16) + 'px "PingFang SC","Microsoft YaHei",sans-serif';
-  ctx.fillText('鍒紑', w / 2, h / 2 - 6);
-  ctx.fillStyle = 'rgba(255,255,255,0.55)';
-  ctx.font = (w * 0.09) + 'px "PingFang SC","Microsoft YaHei",sans-serif';
-  ctx.fillText('鉂わ笍', w / 2, h / 2 + 20);
-}
-
-function selectCard(index) {
-  selectedIndex = index;
-  bottomHint.textContent = '馃憜 鐢ㄦ墜鎸囧埉寮€娑傚眰锛?;
-  bottomHint.style.animation = 'pulse 1.5s ease-in-out infinite';
-  cards.forEach((c, i) => {
-    if (i !== index) {
-      c.wrapper.classList.remove('enabled');
-      c.wrapper.classList.add('disabled');
-      var lock = document.createElement('div');
-      lock.className = 'lock-overlay';
-      lock.textContent = '馃敀';
-      c.wrapper.appendChild(lock);
+    function shuffle(items) {
+      const copied = [...items];
+      for (let index = copied.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [copied[index], copied[randomIndex]] = [copied[randomIndex], copied[index]];
+      }
+      return copied;
     }
-  });
-}
 
-function bindScratch(canvas, index) {
-  function getPos(e) {
-    var rect = canvas.getBoundingClientRect();
-    if (e.touches) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-  }
+    function createCard(prize, index) {
+      const card = document.createElement("button");
+      card.className = "scratch-card";
+      card.type = "button";
+      card.setAttribute("aria-label", `第 ${index + 1} 张刮刮乐，点击揭晓礼物`);
+      card.innerHTML = `
+        <div class="prize">
+          <div class="prize-icon">${prize.icon}</div>
+          <div class="prize-title">${prize.title}</div>
+          <div class="prize-desc">${prize.desc}</div>
+        </div>
+        <div class="cover">
+          <div class="cover-symbol">💖</div>
+          <div class="cover-title">点我刮开</div>
+          <div class="cover-tip">第 ${index + 1} 张好运卡</div>
+        </div>
+      `;
 
-  canvas.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    if (isRevealed) return;
-    if (selectedIndex === -1) { selectCard(index); return; }
-    if (selectedIndex !== index) return;
-    isDrawing = true;
-    var pos = getPos(e);
-    scratchAt(index, pos.x, pos.y);
-  }, { passive: false });
-
-  canvas.addEventListener('touchmove', function(e) {
-    e.preventDefault();
-    if (!isDrawing || selectedIndex !== index || isRevealed) return;
-    var pos = getPos(e);
-    scratchAt(index, pos.x, pos.y);
-  }, { passive: false });
-
-  canvas.addEventListener('touchend', function() { isDrawing = false; });
-
-  canvas.addEventListener('mousedown', function(e) {
-    if (isRevealed) return;
-    if (selectedIndex === -1) { selectCard(index); return; }
-    if (selectedIndex !== index) return;
-    isDrawing = true;
-    var pos = getPos(e);
-    scratchAt(index, pos.x, pos.y);
-  });
-
-  canvas.addEventListener('mousemove', function(e) {
-    if (!isDrawing || selectedIndex !== index || isRevealed) return;
-    var pos = getPos(e);
-    scratchAt(index, pos.x, pos.y);
-  });
-
-  canvas.addEventListener('mouseup', function() { isDrawing = false; });
-  canvas.addEventListener('mouseleave', function() { isDrawing = false; });
-}
-
-function scratchAt(index, x, y) {
-  var c = cards[index];
-  var ctx = c.ctx;
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.beginPath();
-  ctx.arc(x, y, 24, 0, Math.PI * 2);
-  ctx.fill();
-  c.scratchCount++;
-  if (c.scratchCount % 6 === 0) checkReveal(index);
-}
-
-function checkReveal(index) {
-  var c = cards[index];
-  var canvas = c.canvas;
-  var imageData = c.ctx.getImageData(0, 0, canvas.width, canvas.height);
-  var pixels = imageData.data;
-  var transparent = 0;
-  var total = pixels.length / 4;
-  var step = Math.max(1, Math.floor(total / 3000));
-  for (var i = 3; i < pixels.length; i += 4 * step) {
-    if (pixels[i] === 0) transparent++;
-  }
-  if (transparent / (total / step) > 0.4) revealCard(index);
-}
-
-function revealCard(index) {
-  isRevealed = true;
-  var c = cards[index];
-  c.revealed = true;
-  bottomHint.textContent = '';
-  bottomHint.style.animation = 'none';
-  var ctx = c.ctx;
-  var wrapper = c.wrapper;
-  var w = wrapper.clientWidth;
-  var alpha = 0;
-  function tick() {
-    alpha += 0.06;
-    if (alpha >= 1) {
-      ctx.clearRect(0, 0, w, w);
-      updateCardInner(index);
-      showResultModal(index);
-      return;
+      card.addEventListener("click", () => revealCard(card, prize));
+      return card;
     }
-    ctx.clearRect(0, 0, w, w);
-    ctx.globalAlpha = 1 - alpha;
-    drawCardOverlay(index);
-    ctx.globalAlpha = 1;
-    requestAnimationFrame(tick);
-  }
-  tick();
-}
 
-function updateCardInner(index) {
-  var c = cards[index];
-  c.inner.querySelector('.prize-emoji').textContent = c.prize.emoji;
-  c.inner.querySelector('.prize-label').textContent = '馃帄 浣犱腑浜?;
-  c.inner.querySelector('.prize-name').textContent = c.prize.name;
-}
+    function revealCard(card, prize) {
+      if (card.classList.contains("revealed")) {
+        return;
+      }
 
-function showResultModal(index) {
-  var c = cards[index];
-  modalEmoji.textContent = c.prize.emoji;
-  modalText.textContent = c.prize.name === '浠ヤ笂鍏ㄩ儴锛? ? '鍝囷紒锛? : '鎭枩浣狅紒';
-  modalPrize.textContent = c.prize.name;
-  modalDesc.textContent = c.prize.desc;
+      card.classList.add("revealed");
+      revealedCards.push(prize);
+      selectedPrize.classList.remove("show");
 
-  revealRow.innerHTML = '';
-  cards.forEach(function(cc, i) {
-    if (i !== index) {
-      var div = document.createElement('div');
-      div.className = 'mini-card';
-      div.innerHTML = '<div class="mini-emoji">' + cc.prize.emoji + '</div><div class="mini-name">' + cc.prize.name + '</div>';
-      revealRow.appendChild(div);
+      if (prize.title.includes("以上全部")) {
+        resultTitle.textContent = "哇！宝宝抽到超级大奖啦";
+        resultText.textContent = "这张卡片直接解锁全部礼物，今天的好运属于宝宝。";
+        selectedPrize.textContent = `${prize.icon} ${prize.title}：${prize.desc}`;
+        selectedPrize.classList.add("show");
+        burstHearts(18);
+        return;
+      }
+
+      resultTitle.textContent = `刮出了：${prize.icon} ${prize.title}`;
+      resultText.textContent = revealedCards.length === 4
+        ? "4 张都刮完啦，现在可以让命运帮宝宝选一个，也可以直接找我兑现最心动的那个。"
+        : `已经刮开 ${revealedCards.length} 张，还可以继续看看有没有超级大奖。`;
+      burstHearts(8);
     }
-  });
 
-  cards.forEach(function(cc, i) {
-    if (i !== index) {
-      cc.ctx.clearRect(0, 0, cc.wrapper.clientWidth, cc.wrapper.clientHeight);
-      var lock = cc.wrapper.querySelector('.lock-overlay');
-      if (lock) lock.remove();
-      cc.inner.querySelector('.prize-emoji').textContent = cc.prize.emoji;
-      cc.inner.querySelector('.prize-label').textContent = '鏈€夋嫨';
-      cc.inner.querySelector('.prize-name').textContent = cc.prize.name;
-      cc.wrapper.classList.remove('disabled');
+    function chooseFromRevealed() {
+      if (revealedCards.length === 0) {
+        resultTitle.textContent = "宝宝还没刮开礼物呢";
+        resultText.textContent = "先点开任意一张刮刮乐，再让命运挑一个。";
+        return;
+      }
+
+      const jackpot = revealedCards.find((item) => item.title.includes("以上全部"));
+      const chosen = jackpot || revealedCards[Math.floor(Math.random() * revealedCards.length)];
+      resultTitle.textContent = jackpot ? "最终奖励：全部拿下" : "最终奖励已经选好啦";
+      resultText.textContent = "请截图给最爱宝宝的人，马上安排兑现。";
+      selectedPrize.textContent = `${chosen.icon} ${chosen.title}：${chosen.desc}`;
+      selectedPrize.classList.add("show");
+      burstHearts(22);
     }
-  });
 
-  resultModal.classList.remove('hidden');
-  spawnConfetti();
-}
+    function burstHearts(count) {
+      const symbols = ["💗", "💖", "💕", "💘", "🌟"];
+      for (let index = 0; index < count; index += 1) {
+        const heart = document.createElement("span");
+        heart.className = "heart";
+        heart.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        heart.style.left = `${Math.random() * 100}%`;
+        heart.style.animationDelay = `${Math.random() * 0.45}s`;
+        heart.style.fontSize = `${18 + Math.random() * 18}px`;
+        hearts.appendChild(heart);
+        window.setTimeout(() => heart.remove(), 3300);
+      }
+    }
 
-function closeModal() { resultModal.classList.add('hidden'); }
+    function resetGame() {
+      cards = shuffle(prizes).slice(0, 4);
+      revealedCards = [];
+      selectedPrize.classList.remove("show");
+      selectedPrize.textContent = "";
+      resultTitle.textContent = "先刮开一张看看吧";
+      resultText.textContent = "刮开的礼物会出现在卡片里，全部刮完以后宝宝可以选一个最心动的。";
+      grid.replaceChildren(...cards.map(createCard));
+    }
 
-function resetGame() { confettiContainer.innerHTML = ''; buildCards(); }
-
-// ============================================================
-// 绀艰姳
-// ============================================================
-function spawnConfetti() {
-  var colors = ['#e91e63','#f06292','#f48fb1','#ff80ab','#ff4081','#ffc107','#ffab91'];
-  var frag = document.createDocumentFragment();
-  for (var i = 0; i < 80; i++) {
-    var p = document.createElement('div');
-    var s = Math.random() * 8 + 4;
-    p.style.cssText = 'position:absolute;left:' + (Math.random()*100) + '%;top:-10px;width:' + s + 'px;height:' + (s*(Math.random()*0.5+0.5)) + 'px;background:' + colors[Math.floor(Math.random()*colors.length)] + ';border-radius:' + (Math.random()>0.6?'50%':'2px') + ';transform:rotate(' + (Math.random()*360) + 'deg);animation:confettiFall ' + (Math.random()*2+2) + 's linear forwards;animation-delay:' + (Math.random()*0.6) + 's';
-    frag.appendChild(p);
-  }
-  var s = document.createElement('style');
-  s.textContent = '@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg) scale(1);opacity:1}100%{transform:translateY(105vh) rotate(720deg) scale(0.2);opacity:0}}';
-  confettiContainer.appendChild(s);
-  confettiContainer.appendChild(frag);
-  setTimeout(function(){ confettiContainer.innerHTML = ''; }, 4000);
-}
-
-// ============================================================
-// 鑳屾櫙鐖卞績
-// ============================================================
-function spawnHearts() {
-  var bg = document.getElementById('heartsBg');
-  var hearts = ['鉂?,'馃挄','馃挅','馃挆','馃挐'];
-  for (var i = 0; i < 12; i++) {
-    var h = document.createElement('div');
-    h.textContent = hearts[Math.floor(Math.random()*5)];
-    h.style.cssText = 'position:fixed;left:' + (Math.random()*100) + '%;top:' + (Math.random()*100) + '%;font-size:' + (Math.random()*16+10) + 'px;opacity:' + (Math.random()*0.15+0.05) + ';animation:floatHeart ' + (Math.random()*8+8) + 's linear infinite;animation-delay:' + (Math.random()*5) + 's;pointer-events:none';
-    bg.appendChild(h);
-  }
-  var s = document.createElement('style');
-  s.textContent = '@keyframes floatHeart{0%{transform:translateY(0) rotate(0deg);opacity:0.12}50%{transform:translateY(-60vh) rotate(20deg);opacity:0.05}100%{transform:translateY(-110vh) rotate(0deg);opacity:0.1}}';
-  bg.appendChild(s);
-}
-
-window.addEventListener('resize', function() {
-  if (!isRevealed && selectedIndex >= 0) initCardCanvas(selectedIndex);
-});
-
-spawnHearts();
-buildCards();
-</script>
-
+    chooseButton.addEventListener("click", chooseFromRevealed);
+    resetButton.addEventListener("click", resetGame);
+    resetGame();
+  </script>
 </body>
 </html>
