@@ -378,12 +378,13 @@ function initCardCanvas(index) {
   const wrapper = c.wrapper;
   const canvas = c.canvas;
   const rect = wrapper.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
   canvas.width = rect.width * dpr;
   canvas.height = rect.height * dpr;
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
   c.ctx = ctx;
+  c.scratchCount = 0;
   drawCardOverlay(index);
 }
 
@@ -495,24 +496,24 @@ function scratchAt(index, x, y) {
   ctx.beginPath();
   ctx.arc(x, y, 24, 0, Math.PI * 2);
   ctx.fill();
-  checkReveal(index);
+  c.scratchCount++;
+  if (c.scratchCount % 6 === 0) {
+    checkReveal(index);
+  }
 }
 
 function checkReveal(index) {
   const c = cards[index];
-  const wrapper = c.wrapper;
   const canvas = c.canvas;
-  const w = wrapper.clientWidth;
-  const h = wrapper.clientHeight;
-  const dpr = window.devicePixelRatio || 1;
   const imageData = c.ctx.getImageData(0, 0, canvas.width, canvas.height);
   const pixels = imageData.data;
   let transparent = 0;
   const total = pixels.length / 4;
-  for (let i = 3; i < pixels.length; i += 4) {
+  const step = Math.max(1, Math.floor(total / 3000));
+  for (let i = 3; i < pixels.length; i += 4 * step) {
     if (pixels[i] === 0) transparent++;
   }
-  if (transparent / total > 0.4) {
+  if (transparent / (total / step) > 0.4) {
     revealCard(index);
   }
 }
