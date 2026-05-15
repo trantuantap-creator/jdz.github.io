@@ -20,219 +20,111 @@
   }
   .container { width: 100%; max-width: 420px; padding: 16px; }
 
-  .header {
-    text-align: center;
-    margin-bottom: 8px;
-  }
+  .header { text-align: center; margin-bottom: 8px; }
   .header .icon { font-size: 40px; }
   .header .title {
-    font-size: 24px;
-    font-weight: 900;
-    color: #fff;
+    font-size: 24px; font-weight: 900; color: #fff;
     text-shadow: 0 2px 8px rgba(180,40,80,0.4);
-    letter-spacing: 3px;
-    margin: 4px 0;
+    letter-spacing: 3px; margin: 4px 0;
   }
   .header .subtitle {
-    font-size: 13px;
-    color: rgba(255,255,255,0.85);
-    letter-spacing: 2px;
+    font-size: 13px; color: rgba(255,255,255,0.85); letter-spacing: 2px;
   }
 
-  /* 鍗＄墖缃戞牸 */
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin: 12px 0;
-  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
 
   .card-item {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(180,40,80,0.25);
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
+    position: relative; aspect-ratio: 1 / 1; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(180,40,80,0.25); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer;
   }
-  .card-item.enabled:active {
-    transform: scale(0.96);
-  }
-  .card-item.disabled {
-    opacity: 0.4;
-    pointer-events: none;
-  }
+  .card-item.enabled:active { transform: scale(0.96); }
+  .card-item.disabled { opacity: 0.4; pointer-events: none; }
 
   .card-inner {
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background: linear-gradient(145deg, #fff 0%, #fff0f5 100%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    padding: 8px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px;
   }
   .card-inner .prize-emoji { font-size: 36px; }
   .card-inner .prize-label { font-size: 11px; color: #e91e63; letter-spacing: 2px; font-weight: 600; }
   .card-inner .prize-name { font-size: 15px; font-weight: 900; color: #c62828; text-align: center; line-height: 1.3; }
   .card-inner .card-number {
-    position: absolute;
-    top: 10px;
-    right: 14px;
-    font-size: 13px;
-    font-weight: 900;
-    color: rgba(233,30,99,0.25);
+    position: absolute; top: 10px; right: 14px;
+    font-size: 13px; font-weight: 900; color: rgba(233,30,99,0.25);
   }
 
   canvas.scratch-canvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    touch-action: none;
+    position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none;
   }
 
   .lock-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 40px;
-    pointer-events: none;
-    z-index: 2;
+    position: absolute; inset: 0; background: rgba(0,0,0,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; pointer-events: none; z-index: 2;
   }
 
-  /* 搴曢儴鎻愮ず */
   .bottom-hint {
-    text-align: center;
-    color: rgba(255,255,255,0.9);
-    font-size: 13px;
-    letter-spacing: 2px;
-    animation: pulse 1.5s ease-in-out infinite;
-    margin: 4px 0 12px;
-    min-height: 20px;
+    text-align: center; color: rgba(255,255,255,0.9); font-size: 13px;
+    letter-spacing: 2px; animation: pulse 1.5s ease-in-out infinite;
+    margin: 4px 0 12px; min-height: 20px;
   }
   @keyframes pulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
+    0%, 100% { opacity: 0.6; } 50% { opacity: 1; }
   }
 
-  /* 搴曢儴鎸夐挳 */
   .btn-area { text-align: center; margin-top: 8px; }
   .btn-area .btn {
-    display: inline-block;
-    background: rgba(255,255,255,0.25);
-    backdrop-filter: blur(10px);
-    color: #fff;
-    border: 2px solid rgba(255,255,255,0.5);
-    padding: 10px 32px;
-    border-radius: 24px;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 3px;
-    cursor: pointer;
-    transition: all 0.2s;
+    display: inline-block; background: rgba(255,255,255,0.25); backdrop-filter: blur(10px);
+    color: #fff; border: 2px solid rgba(255,255,255,0.5);
+    padding: 10px 32px; border-radius: 24px; font-size: 14px;
+    font-weight: 600; letter-spacing: 3px; cursor: pointer; transition: all 0.2s;
   }
-  .btn-area .btn:active {
-    background: rgba(255,255,255,0.4);
-    transform: scale(0.95);
-  }
+  .btn-area .btn:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
 
-  /* 寮圭獥 */
   .modal-mask {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+    display: flex; align-items: center; justify-content: center; z-index: 999;
     animation: fadeIn 0.3s ease;
   }
   .modal-mask.hidden { display: none; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
   .modal-box {
-    background: #fff;
-    border-radius: 20px;
-    padding: 28px 20px 22px;
-    text-align: center;
-    width: 88%;
-    max-width: 340px;
+    background: #fff; border-radius: 20px; padding: 28px 20px 22px;
+    text-align: center; width: 88%; max-width: 340px;
     animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
-  @keyframes popIn {
-    from { transform: scale(0.7); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
+  @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
   .modal-box .modal-emoji { font-size: 52px; margin-bottom: 8px; }
   .modal-box .modal-text { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 4px; }
   .modal-box .modal-prize { font-size: 22px; font-weight: 900; color: #e91e63; margin-bottom: 4px; }
   .modal-box .modal-desc { font-size: 13px; color: #888; margin-bottom: 14px; line-height: 1.5; }
   .modal-box .btn {
-    display: inline-block;
-    background: linear-gradient(135deg, #f06292, #e91e63);
-    color: #fff;
-    border: none;
-    padding: 10px 36px;
-    border-radius: 24px;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    cursor: pointer;
+    display: inline-block; background: linear-gradient(135deg, #f06292, #e91e63);
+    color: #fff; border: none; padding: 10px 36px; border-radius: 24px;
+    font-size: 15px; font-weight: 600; letter-spacing: 2px; cursor: pointer;
   }
   .modal-box .btn:active { transform: scale(0.95); }
 
-  /* 鍏朵綑鍗＄墖鎻檽 */
   .reveal-row {
-    display: flex;
-    gap: 4px;
-    justify-content: center;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px dashed #eee;
-    flex-wrap: wrap;
+    display: flex; gap: 4px; justify-content: center; margin-top: 12px;
+    padding-top: 12px; border-top: 1px dashed #eee; flex-wrap: wrap;
   }
   .reveal-row .mini-card {
-    background: #fff5f7;
-    border-radius: 8px;
-    padding: 6px 10px;
-    text-align: center;
-    flex: 1;
+    background: #fff5f7; border-radius: 8px; padding: 6px 10px;
+    text-align: center; flex: 1;
   }
   .reveal-row .mini-card .mini-emoji { font-size: 20px; }
   .reveal-row .mini-card .mini-name {
-    font-size: 10px;
-    color: #e91e63;
-    font-weight: 700;
-    margin-top: 2px;
-    line-height: 1.3;
+    font-size: 10px; color: #e91e63; font-weight: 700; margin-top: 2px; line-height: 1.3;
   }
   .reveal-row .mini-card .mini-desc {
-    font-size: 9px;
-    color: #999;
-    margin-top: 2px;
-    line-height: 1.3;
+    font-size: 9px; color: #999; margin-top: 2px; line-height: 1.3;
   }
 
-  .confetti-container {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1000;
-  }
-
-  /* 鐖卞績椋樿惤 */
-  .hearts-bg {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-  }
+  .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 1000; }
+  .hearts-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
 </style>
 </head>
 <body>
@@ -270,18 +162,18 @@
 
 <script>
 // ============================================================
-// 馃巵 濂栧搧閰嶇疆锛堜慨鏀硅繖閲岋級鈥?鑷冲皯4涓? weight 鎺у埗姒傜巼
+// 馃巵 濂栧搧
 // ============================================================
 const PRIZES = [
   { name: "娲楁姢濂楄",   emoji: "馃Т", desc: "璁╁疂瀹濈殑鑴稿彉寰楀瀚╁搾" },
   { name: "杩愬姩璺戦瀷",   emoji: "馃憻", desc: "璁╁疂瀹濆湪閿荤偧鐨勬椂鍊欐洿杞绘澗鏇磋垝閫? },
   { name: "鍓冮』鍒€",     emoji: "馃獟", desc: "璁╁疂瀹濈殑鑴告竻鐖藉埄钀斤紝鎵紨楂樹腑鐢? },
   { name: "绁炵灏忔儕鍠?, emoji: "馃巵", desc: "涓撳睘闄愬畾灏忓僵铔嬶紝鏄瀵嗗厛涓嶈鍝? },
-  { name: "浠ヤ笂鍏ㄩ儴锛?, emoji: "馃帀", desc: "瀹濆疂鐪熺殑涓ぇ濂栵紝浠ヤ笂绀肩墿锛屼竴娆℃€у叏鎷ユ湁" },
+  { name: "浠ヤ笂鍏ㄩ儴锛?, emoji: "馃帀", desc: "瀹濆疂鐪熺殑涓ぇ濂栵紝浠ヤ笂绀肩墿涓€娆℃€у叏鎷ユ湁" },
 ];
 
 // ============================================================
-// 浠庡姹犱腑鎶?涓笉閲嶅鐨勫鍝?// ============================================================
+// 闅忔満鎶?涓紙娲楃墝鍚庡彇鍓?锛?// ============================================================
 function pickPrizes() {
   const arr = [...PRIZES];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -293,7 +185,7 @@ function pickPrizes() {
 
 // ============================================================
 // 鍏ㄥ眬鐘舵€?// ============================================================
-let cards = [];           // { prize, revealed, canvas, ctx, wrapper }
+let cards = [];
 let selectedIndex = -1;
 let isRevealed = false;
 let isDrawing = false;
@@ -325,12 +217,7 @@ function buildCards() {
 
     const inner = document.createElement('div');
     inner.className = 'card-inner';
-    inner.innerHTML = `
-      <div class="prize-emoji">鉂?/div>
-      <div class="prize-label">???</div>
-      <div class="prize-name">鍒紑鎻檽</div>
-      <div class="card-number">0${i + 1}</div>
-    `;
+    inner.innerHTML = '<div class="prize-emoji">鉂?/div><div class="prize-label">???</div><div class="prize-name">鍒紑鎻檽</div><div class="card-number">0' + (i + 1) + '</div>';
 
     const canvas = document.createElement('canvas');
     canvas.className = 'scratch-canvas';
@@ -339,30 +226,13 @@ function buildCards() {
     wrapper.appendChild(canvas);
     cardGrid.appendChild(wrapper);
 
-    const cardObj = {
-      prize: prizes[i],
-      revealed: false,
-      canvas,
-      wrapper,
-      inner,
-    };
+    const cardObj = { prize: prizes[i], revealed: false, canvas, wrapper, inner, scratchCount: 0 };
     cards.push(cardObj);
-
-    // 鐐瑰嚮閫夋嫨
-    wrapper.addEventListener('click', (e) => {
-      if (isRevealed || selectedIndex !== -1) return;
-      selectCard(i);
-    });
-
-    // 鍒崱浜嬩欢
     bindScratch(canvas, i);
   }
 
-  // 绛塂OM娓叉煋瀹屽垵濮嬪寲canvas
   requestAnimationFrame(() => {
-    cards.forEach((c, i) => {
-      initCardCanvas(i);
-    });
+    cards.forEach((c, i) => { initCardCanvas(i); });
   });
 }
 
@@ -377,7 +247,6 @@ function initCardCanvas(index) {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
   c.ctx = ctx;
-  c.scratchCount = 0;
   drawCardOverlay(index);
 }
 
@@ -387,37 +256,25 @@ function drawCardOverlay(index) {
   const w = wrapper.clientWidth;
   const h = wrapper.clientHeight;
   const ctx = c.ctx;
-  ctx.clearRect(0, 0, w, h);
-
-  // 娓愬彉搴曡壊
   const grad = ctx.createLinearGradient(0, 0, w, h);
   grad.addColorStop(0, '#e0a0b0');
   grad.addColorStop(0.5, '#d4879b');
   grad.addColorStop(1, '#c07085');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, w, h);
-
-  // 蹇冨舰绾圭悊
   ctx.fillStyle = 'rgba(255,255,255,0.2)';
-  ctx.font = `${w * 0.15}px serif`;
+  ctx.font = (w * 0.15) + 'px serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   for (let i = 0; i < 20; i++) {
-    const x = Math.random() * w;
-    const y = Math.random() * h;
-    ctx.fillText('鈾?, x, y);
-    ctx.fillText('鉂?, x + 10, y - 8);
+    ctx.fillText('鈾?, Math.random() * w, Math.random() * h);
+    ctx.fillText('鉂?, Math.random() * w, Math.random() * h);
   }
-
-  // 涓績鍥炬
   ctx.fillStyle = 'rgba(255,255,255,0.9)';
-  ctx.font = `bold ${w * 0.16}px "PingFang SC","Microsoft YaHei",sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  ctx.font = 'bold ' + (w * 0.16) + 'px "PingFang SC","Microsoft YaHei",sans-serif';
   ctx.fillText('鍒紑', w / 2, h / 2 - 6);
-
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
-  ctx.font = `${w * 0.09}px "PingFang SC","Microsoft YaHei",sans-serif`;
+  ctx.font = (w * 0.09) + 'px "PingFang SC","Microsoft YaHei",sans-serif';
   ctx.fillText('鉂わ笍', w / 2, h / 2 + 20);
 }
 
@@ -425,13 +282,11 @@ function selectCard(index) {
   selectedIndex = index;
   bottomHint.textContent = '馃憜 鐢ㄦ墜鎸囧埉寮€娑傚眰锛?;
   bottomHint.style.animation = 'pulse 1.5s ease-in-out infinite';
-
-  // 鍏朵粬鍗＄墖鍙樻殫
   cards.forEach((c, i) => {
     if (i !== index) {
       c.wrapper.classList.remove('enabled');
       c.wrapper.classList.add('disabled');
-      const lock = document.createElement('div');
+      var lock = document.createElement('div');
       lock.className = 'lock-overlay';
       lock.textContent = '馃敀';
       c.wrapper.appendChild(lock);
@@ -441,98 +296,84 @@ function selectCard(index) {
 
 function bindScratch(canvas, index) {
   function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    if (e.touches) {
-      return {
-        x: e.touches[0].clientX - rect.left,
-        y: e.touches[0].clientY - rect.top
-      };
-    }
+    var rect = canvas.getBoundingClientRect();
+    if (e.touches) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   }
 
-  canvas.addEventListener('touchstart', (e) => {
+  canvas.addEventListener('touchstart', function(e) {
     e.preventDefault();
     if (isRevealed) return;
-    if (selectedIndex === -1) {
-      selectCard(index);
-      return;
-    }
+    if (selectedIndex === -1) { selectCard(index); return; }
     if (selectedIndex !== index) return;
     isDrawing = true;
-    const pos = getPos(e);
+    var pos = getPos(e);
     scratchAt(index, pos.x, pos.y);
   }, { passive: false });
 
-  canvas.addEventListener('touchmove', (e) => {
+  canvas.addEventListener('touchmove', function(e) {
     e.preventDefault();
     if (!isDrawing || selectedIndex !== index || isRevealed) return;
-    const pos = getPos(e);
+    var pos = getPos(e);
     scratchAt(index, pos.x, pos.y);
   }, { passive: false });
 
-  canvas.addEventListener('touchend', () => { isDrawing = false; });
-  canvas.addEventListener('mousedown', (e) => {
+  canvas.addEventListener('touchend', function() { isDrawing = false; });
+
+  canvas.addEventListener('mousedown', function(e) {
     if (isRevealed) return;
-    if (selectedIndex === -1) {
-      selectCard(index);
-      return;
-    }
+    if (selectedIndex === -1) { selectCard(index); return; }
     if (selectedIndex !== index) return;
     isDrawing = true;
-    const pos = getPos(e);
+    var pos = getPos(e);
     scratchAt(index, pos.x, pos.y);
   });
-  canvas.addEventListener('mousemove', (e) => {
+
+  canvas.addEventListener('mousemove', function(e) {
     if (!isDrawing || selectedIndex !== index || isRevealed) return;
-    const pos = getPos(e);
+    var pos = getPos(e);
     scratchAt(index, pos.x, pos.y);
   });
-  canvas.addEventListener('mouseup', () => { isDrawing = false; });
-  canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+
+  canvas.addEventListener('mouseup', function() { isDrawing = false; });
+  canvas.addEventListener('mouseleave', function() { isDrawing = false; });
 }
 
 function scratchAt(index, x, y) {
-  const c = cards[index];
-  const ctx = c.ctx;
+  var c = cards[index];
+  var ctx = c.ctx;
   ctx.globalCompositeOperation = 'destination-out';
   ctx.beginPath();
   ctx.arc(x, y, 24, 0, Math.PI * 2);
   ctx.fill();
   c.scratchCount++;
-  if (c.scratchCount % 6 === 0) {
-    checkReveal(index);
-  }
+  if (c.scratchCount % 6 === 0) checkReveal(index);
 }
 
 function checkReveal(index) {
-  const c = cards[index];
-  const canvas = c.canvas;
-  const imageData = c.ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const pixels = imageData.data;
-  let transparent = 0;
-  const total = pixels.length / 4;
-  const step = Math.max(1, Math.floor(total / 3000));
-  for (let i = 3; i < pixels.length; i += 4 * step) {
+  var c = cards[index];
+  var canvas = c.canvas;
+  var imageData = c.ctx.getImageData(0, 0, canvas.width, canvas.height);
+  var pixels = imageData.data;
+  var transparent = 0;
+  var total = pixels.length / 4;
+  var step = Math.max(1, Math.floor(total / 3000));
+  for (var i = 3; i < pixels.length; i += 4 * step) {
     if (pixels[i] === 0) transparent++;
   }
-  if (transparent / (total / step) > 0.4) {
-    revealCard(index);
-  }
+  if (transparent / (total / step) > 0.4) revealCard(index);
 }
 
 function revealCard(index) {
   isRevealed = true;
-  const c = cards[index];
+  var c = cards[index];
   c.revealed = true;
   bottomHint.textContent = '';
   bottomHint.style.animation = 'none';
-
-  // 鍔ㄧ敾娓呴櫎娑傚眰
-  const ctx = c.ctx;
-  const wrapper = c.wrapper;
-  const w = wrapper.clientWidth;
-  let alpha = 0;
+  var ctx = c.ctx;
+  var wrapper = c.wrapper;
+  var w = wrapper.clientWidth;
+  var alpha = 0;
   function tick() {
     alpha += 0.06;
     if (alpha >= 1) {
@@ -551,48 +392,37 @@ function revealCard(index) {
 }
 
 function updateCardInner(index) {
-  const c = cards[index];
-  const inner = c.inner;
-  inner.querySelector('.prize-emoji').textContent = c.prize.emoji;
-  inner.querySelector('.prize-label').textContent = '馃帄 浣犱腑浜?;
-  inner.querySelector('.prize-name').textContent = c.prize.name;
+  var c = cards[index];
+  c.inner.querySelector('.prize-emoji').textContent = c.prize.emoji;
+  c.inner.querySelector('.prize-label').textContent = '馃帄 浣犱腑浜?;
+  c.inner.querySelector('.prize-name').textContent = c.prize.name;
 }
 
 function showResultModal(index) {
-  const c = cards[index];
+  var c = cards[index];
   modalEmoji.textContent = c.prize.emoji;
   modalText.textContent = c.prize.name === '浠ヤ笂鍏ㄩ儴锛? ? '鍝囷紒锛? : '鎭枩浣狅紒';
   modalPrize.textContent = c.prize.name;
   modalDesc.textContent = c.prize.desc;
 
-  // 鏄剧ず鍏朵綑鍗＄墖
   revealRow.innerHTML = '';
-  cards.forEach((cc, i) => {
+  cards.forEach(function(cc, i) {
     if (i !== index) {
-      const div = document.createElement('div');
+      var div = document.createElement('div');
       div.className = 'mini-card';
-      div.innerHTML = `
-        <div class="mini-emoji">${cc.prize.emoji}</div>
-        <div class="mini-name">${cc.prize.name}</div>
-        <div class="mini-desc">${cc.prize.desc}</div>
-      `;
+      div.innerHTML = '<div class="mini-emoji">' + cc.prize.emoji + '</div><div class="mini-name">' + cc.prize.name + '</div>';
       revealRow.appendChild(div);
     }
   });
 
-  // 娓呴櫎鏈€夊崱鐗囨秱灞傦紝鏄剧ず鍐呭
-  cards.forEach((cc, i) => {
+  cards.forEach(function(cc, i) {
     if (i !== index) {
-      const ctx = cc.ctx;
-      const wrapper = cc.wrapper;
-      ctx.clearRect(0, 0, wrapper.clientWidth, wrapper.clientHeight);
-      // 绉婚櫎閿?      const lock = cc.wrapper.querySelector('.lock-overlay');
+      cc.ctx.clearRect(0, 0, cc.wrapper.clientWidth, cc.wrapper.clientHeight);
+      var lock = cc.wrapper.querySelector('.lock-overlay');
       if (lock) lock.remove();
-      // 鏄剧ず鍐呭
-      const inner = cc.inner;
-      inner.querySelector('.prize-emoji').textContent = cc.prize.emoji;
-      inner.querySelector('.prize-label').textContent = '鏈€夋嫨';
-      inner.querySelector('.prize-name').textContent = cc.prize.name;
+      cc.inner.querySelector('.prize-emoji').textContent = cc.prize.emoji;
+      cc.inner.querySelector('.prize-label').textContent = '鏈€夋嫨';
+      cc.inner.querySelector('.prize-name').textContent = cc.prize.name;
       cc.wrapper.classList.remove('disabled');
     }
   });
@@ -601,91 +431,50 @@ function showResultModal(index) {
   spawnConfetti();
 }
 
-function closeModal() {
-  resultModal.classList.add('hidden');
-}
+function closeModal() { resultModal.classList.add('hidden'); }
 
-function resetGame() {
-  confettiContainer.innerHTML = '';
-  buildCards();
-}
+function resetGame() { confettiContainer.innerHTML = ''; buildCards(); }
 
 // ============================================================
 // 绀艰姳
 // ============================================================
 function spawnConfetti() {
-  const colors = ['#e91e63', '#f06292', '#f48fb1', '#ff80ab', '#ff4081', '#ffc107', '#ffab91'];
-  const fragment = document.createDocumentFragment();
-  for (let i = 0; i < 80; i++) {
-    const piece = document.createElement('div');
-    const size = Math.random() * 8 + 4;
-    piece.style.cssText = `
-      position: absolute;
-      left: ${Math.random() * 100}%;
-      top: -10px;
-      width: ${size}px;
-      height: ${size * (Math.random() * 0.5 + 0.5)}px;
-      background: ${colors[Math.floor(Math.random() * colors.length)]};
-      border-radius: ${Math.random() > 0.6 ? '50%' : '2px'};
-      transform: rotate(${Math.random() * 360}deg);
-      animation: confettiFall ${Math.random() * 2 + 2}s linear forwards;
-      animation-delay: ${Math.random() * 0.6}s;
-    `;
-    fragment.appendChild(piece);
+  var colors = ['#e91e63','#f06292','#f48fb1','#ff80ab','#ff4081','#ffc107','#ffab91'];
+  var frag = document.createDocumentFragment();
+  for (var i = 0; i < 80; i++) {
+    var p = document.createElement('div');
+    var s = Math.random() * 8 + 4;
+    p.style.cssText = 'position:absolute;left:' + (Math.random()*100) + '%;top:-10px;width:' + s + 'px;height:' + (s*(Math.random()*0.5+0.5)) + 'px;background:' + colors[Math.floor(Math.random()*colors.length)] + ';border-radius:' + (Math.random()>0.6?'50%':'2px') + ';transform:rotate(' + (Math.random()*360) + 'deg);animation:confettiFall ' + (Math.random()*2+2) + 's linear forwards;animation-delay:' + (Math.random()*0.6) + 's';
+    frag.appendChild(p);
   }
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes confettiFall {
-      0% { transform: translateY(0) rotate(0deg) scale(1); opacity:1; }
-      100% { transform: translateY(105vh) rotate(720deg) scale(0.2); opacity:0; }
-    }
-  `;
-  confettiContainer.appendChild(style);
-  confettiContainer.appendChild(fragment);
-  setTimeout(() => { confettiContainer.innerHTML = ''; }, 4000);
+  var s = document.createElement('style');
+  s.textContent = '@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg) scale(1);opacity:1}100%{transform:translateY(105vh) rotate(720deg) scale(0.2);opacity:0}}';
+  confettiContainer.appendChild(s);
+  confettiContainer.appendChild(frag);
+  setTimeout(function(){ confettiContainer.innerHTML = ''; }, 4000);
 }
 
 // ============================================================
-// 鑳屾櫙娴姩鐖卞績
+// 鑳屾櫙鐖卞績
 // ============================================================
 function spawnHearts() {
-  const bg = document.getElementById('heartsBg');
-  for (let i = 0; i < 12; i++) {
-    const heart = document.createElement('div');
-    const size = Math.random() * 16 + 10;
-    heart.textContent = ['鉂?, '馃挄', '馃挅', '馃挆', '馃挐'][Math.floor(Math.random() * 5)];
-    heart.style.cssText = `
-      position: fixed;
-      left: ${Math.random() * 100}%;
-      top: ${Math.random() * 100}%;
-      font-size: ${size}px;
-      opacity: ${Math.random() * 0.15 + 0.05};
-      animation: floatHeart ${Math.random() * 8 + 8}s linear infinite;
-      animation-delay: ${Math.random() * 5}s;
-      pointer-events: none;
-    `;
-    bg.appendChild(heart);
+  var bg = document.getElementById('heartsBg');
+  var hearts = ['鉂?,'馃挄','馃挅','馃挆','馃挐'];
+  for (var i = 0; i < 12; i++) {
+    var h = document.createElement('div');
+    h.textContent = hearts[Math.floor(Math.random()*5)];
+    h.style.cssText = 'position:fixed;left:' + (Math.random()*100) + '%;top:' + (Math.random()*100) + '%;font-size:' + (Math.random()*16+10) + 'px;opacity:' + (Math.random()*0.15+0.05) + ';animation:floatHeart ' + (Math.random()*8+8) + 's linear infinite;animation-delay:' + (Math.random()*5) + 's;pointer-events:none';
+    bg.appendChild(h);
   }
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes floatHeart {
-      0% { transform: translateY(0) rotate(0deg); opacity: 0.12; }
-      50% { transform: translateY(-60vh) rotate(20deg); opacity: 0.05; }
-      100% { transform: translateY(-110vh) rotate(0deg); opacity: 0.1; }
-    }
-  `;
-  bg.appendChild(style);
+  var s = document.createElement('style');
+  s.textContent = '@keyframes floatHeart{0%{transform:translateY(0) rotate(0deg);opacity:0.12}50%{transform:translateY(-60vh) rotate(20deg);opacity:0.05}100%{transform:translateY(-110vh) rotate(0deg);opacity:0.1}}';
+  bg.appendChild(s);
 }
 
-window.addEventListener('resize', () => {
-  if (!isRevealed && selectedIndex >= 0) {
-    initCardCanvas(selectedIndex);
-  }
+window.addEventListener('resize', function() {
+  if (!isRevealed && selectedIndex >= 0) initCardCanvas(selectedIndex);
 });
 
-// ============================================================
-// 鍚姩
-// ============================================================
 spawnHearts();
 buildCards();
 </script>
